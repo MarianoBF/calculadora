@@ -6,20 +6,69 @@ import React from "react"
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {resultado: "0"}
+    this.state = {cuentas: [], resultado: "", operacion: null, flagoperacion: false, valor: null}
   }
 
   operar = boton => {
-    if (isNaN(boton)) {
-      console.log("es una operación")
+    switch (boton) {
+      case "C":
+        this.setState({resultado: "", operacion: null, flagoperacion: false, cuentas: []});
+        break;
+      case "=":
+        this.setState((state) => { 
+          return {cuentas: [...state.cuentas, state.resultado], resultado: null, operacion: null, flagoperacion: false, valor: state.cuentas.join("")}
+        });
+          
+        // this.setState((state) => {
+        //   return {resultado: b}
+        //   });        
+          break;
+      case "+":
+      case "-":
+      case "*":
+      case "/":        
+        this.setState({cuentas: [...this.state.cuentas, this.state.resultado], resultado: null, operacion: boton, flagoperacion: true})
+        break
+      
+      default:
+        if (this.state.flagoperacion === true) {this.setState({operacion: null, cuentas: [...this.state.cuentas, this.state.operacion], resultado: "", flagoperacion: false})}
+        switch (boton) {
+          case "0":
+            if (this.state.resultado !== "0") { 
+              this.setState((state) => {
+                return {resultado: state.resultado + boton}
+              });
+            } else {
+              this.setState((state) => {
+                return {resultado: state.resultado}
+            });
+            }
+            break;
+          default:
+            this.setState((state) => {
+              return {resultado: state.resultado + boton}
+              });
+            break;
+        }
+        break
+
     }
-    this.setState({resultado: boton})
   }
+
+  sumar = cuenta => {
+    console.log("a")
+  }
+
+ //split(/\+|-|\/|\*/) 
+
+  // calcular = () => {  
+  //   return {resultado: eval(...this.state.cuentas)}
+  // }
 
   render() {
   return (
     <div className="App">
-    <Display resultado={this.state.resultado}/>
+    <Display resultado={this.state.resultado} operacion={this.state.operacion} cuentas={this.state.cuentas}/>
 
     <Boton onClick={this.operar} valor="0" id="zero"/>
     <Boton onClick={this.operar} valor="1" id="one"/>
