@@ -6,69 +6,104 @@ import React from "react"
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {cuentas: [], resultado: "", operacion: null, flagoperacion: false, valor: null}
-  }
+    this.state = {resultado: "0", cantOps: 1, accion: "" }
+  };
 
   operar = boton => {
     switch (boton) {
       case "C":
-        this.setState({resultado: "", operacion: null, flagoperacion: false, cuentas: []});
+        this.borrar();
         break;
       case "=":
-        this.setState((state) => { 
-          return {cuentas: [...state.cuentas, state.resultado], resultado: null, operacion: null, flagoperacion: false, valor: state.cuentas.join("")}
-        });
-          
-        // this.setState((state) => {
-        //   return {resultado: b}
-        //   });        
-          break;
-      case "+":
+        this.calcular();
+        break;
       case "-":
-      case "*":
-      case "/":        
-        this.setState({cuentas: [...this.state.cuentas, this.state.resultado], resultado: null, operacion: boton, flagoperacion: true})
-        break
-      
-      default:
-        if (this.state.flagoperacion === true) {this.setState({operacion: null, cuentas: [...this.state.cuentas, this.state.operacion], resultado: "", flagoperacion: false})}
-        switch (boton) {
-          case "0":
-            if (this.state.resultado !== "0") { 
-              this.setState((state) => {
-                return {resultado: state.resultado + boton}
-              });
-            } else {
-              this.setState((state) => {
-                return {resultado: state.resultado}
+        let resta = String(this.state.resultado).slice(-1);
+        if (resta.match(/[+|*|/]/)) { 
+          this.setState({
+            resultado: this.state.resultado + boton,
+          });
+        } else {
+        this.setState({
+            resultado: this.state.resultado + boton,
+            cantOps: this.state.cantOps + 1        
+        });     
+      } 
+        break;
+      case "+":
+      case "/":
+      case "*": 
+        let opera2 = String(this.state.resultado).slice(-2);
+        let opera = String(this.state.resultado).slice(-1);
+
+        if ((opera2.match(/[+|*|/|-]/g)||[]).length===2) {  //sacado el punto
+          this.setState({
+            resultado: this.state.resultado.slice(0,-2) + boton,
+          });
+        } else if (opera.match(/[+|*|/|-]/)) { 
+            this.setState({
+              resultado: this.state.resultado.slice(0,-1) + boton,
             });
-            }
-            break;
-          default:
-            this.setState((state) => {
-              return {resultado: state.resultado + boton}
-              });
-            break;
-        }
-        break
+        } else {
+        this.setState({
+            resultado: this.state.resultado + boton,
+            cantOps: this.state.cantOps + 1        
+        });     
+      } 
+        break;
+      default:
+        if (boton !== "0") { 
+          if (this.state.resultado.length === 1 && +this.state.resultado[0]===0) {
+            this.setState({
+              resultado: boton
+            })} else {
+              if (boton === ".") { 
+                let resultado = this.state.resultado + boton;
+                let cuentaPuntos = ((String(resultado).match(/\./g)) || []).length
+                  if (cuentaPuntos <= this.state.cantOps) {
+                    this.setState({
+                      resultado: this.state.resultado + boton
+                  })}
+              } else {
+            this.setState({
+            resultado: this.state.resultado + boton
+          
+        });
+              }
+      } 
+      } else {
+        if (this.state.resultado.length === 1 && +this.state.resultado[0]===0) {
+          this.setState({
+            resultado: this.state.resultado
+          })} else {
+         this.setState({
+          resultado: this.state.resultado + boton
+      });} 
+        
+      }
+        
+      }
+    };
+  
 
-    }
-  }
+  calcular = () => {
+    let respuesta = this.state.resultado;
+    if (+respuesta[0]===0) {respuesta = respuesta.slice(1)}
+    this.setState({
+      resultado: eval(respuesta) || "error"
+    });
+  };
 
-  sumar = cuenta => {
-    console.log("a")
-  }
-
- //split(/\+|-|\/|\*/) 
-
-  // calcular = () => {  
-  //   return {resultado: eval(...this.state.cuentas)}
-  // }
+  borrar = () => {
+    this.setState({
+      resultado: "0",
+      cantOps: 1
+    });
+  };
 
   render() {
   return (
     <div className="App">
-    <Display resultado={this.state.resultado} operacion={this.state.operacion} cuentas={this.state.cuentas}/>
 
     <Boton onClick={this.operar} valor="0" id="zero"/>
     <Boton onClick={this.operar} valor="1" id="one"/>
@@ -88,9 +123,17 @@ class App extends React.Component {
     <Boton onClick={this.operar} valor="=" id="equals" />
     <Boton onClick={this.operar} valor="C" id="clear" />
 
+
+<hr />
+
+    <Display resultado={this.state.resultado}/>
+
+
       </div>
   );
 }
 }
+
+
 
 export default App;
