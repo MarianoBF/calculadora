@@ -124,8 +124,6 @@ class App extends React.Component {
     <Boton onClick={this.operar} valor="C" id="clear" />
 
 
-<hr />
-
     <Display resultado={this.state.resultado}/>
 
 
