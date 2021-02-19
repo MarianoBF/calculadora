@@ -6,7 +6,12 @@ body {
   text-align: center;
 }
 
-.App {
+h1 {
+  text-align: center;
+  margin-top: 10vh;
+}
+
+.calculadora {
   position: absolute;
   left: 50%;
   top: 50%;
