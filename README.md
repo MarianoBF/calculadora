@@ -1,1 +1,1 @@
-Una calculadora básica
+Una calculadora básica en ReactJS.
